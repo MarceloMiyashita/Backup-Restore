@@ -1,0 +1,84 @@
+@echo off
+@rem muda a cor da tela do script
+@color 0B
+title REALIZE PRESENTES E DECORACOES
+
+:inicio
+@rem cls
+echo.
+echo ============================================
+echo.=                                          =
+echo = BEM VINDO AO SISTEMA DE BACKUP E RESTORE =
+echo.=                                          =
+echo ============================================
+echo.
+echo ==================MENU======================
+GOTO menu
+
+:menu
+echo Escolher a opcao que deseja realizar:
+echo.
+echo 1 - Backup do sistema;
+echo 2 - Restore do sistema;
+echo 3 - Sair;
+
+set/p "opcao=>"
+IF %opcao% EQU 1 ( GOTO iniciarBkp ) ELSE ( IF %opcao% EQU 2 ( GOTO restore ) ELSE ( IF %opcao% EQU 3 ( GOTO end )))
+
+:iniciarBkp
+cls
+echo FAVOR AGUARDAR...ESTAMOS CRIANDO UM ARQUIVO DE BACKUP...
+
+:: GET DATE ::
+
+echo Date format = %date%
+echo dd = %date:~0,2%
+echo mm = %date:~3,2%
+echo yyyy = %date:~6,8%
+echo.
+echo Time format = %time%
+echo hh = %time:~0,2%
+echo mm = %time:~3,2%
+echo ss = %time:~6,2%
+echo.
+echo Timestamp = %date:~0,2%_%date:~3,2%_%date:~6,8%
+ 
+:: GET DATE - END ::
+
+
+set backupDir="C:\ESTAGIO.BKP.REST"
+set mysqldump="C:\xampp\mysql\bin\mysqldump.exe"
+set mysqlDataDir="C:\xampp\mysql\data"
+
+pushd %mysqlDataDir%
+
+if not exist %backupDir% ( 
+   mkdir %backupDir%
+ %mysqldump% -h localhost -u root --databases realizepresentes> %backupDir%\%date:~0,2%_%date:~3,2%_%date:~6,8%-realizeBkp.sql
+)	
+cls
+echo O ARQUIVO DE BACKUP FOI EXECUTADO COM SUCESSO !!
+echo.
+GOTO menu
+
+:restore
+@rem cls
+echo FAVOR AGUARDAR... O RESTORE ESTA SENDO REALIZADO...
+
+set backupDir="C:\ESTAGIO.BKP.REST"
+set mysql="C:\xampp\mysql\bin\mysql.exe"
+set mysqlDataDir="C:\xampp\mysql\data"
+
+pushd %mysqlDataDir%
+
+if not exist %backupDir% ( 
+   mkdir %backupDir%
+)
+
+%mysql% -h localhost -u root --database realizepresentes < %backupDir%\%date:~0,2%_%date:~3,2%_%date:~6,8%-realizeBkp.sql -vvv
+@rem cls
+echo ARQUIVO DE RESTORE EXECUTADO COM SUCESSO !!;
+echo.
+GOTO menu
+
+
